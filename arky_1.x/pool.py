@@ -8,12 +8,11 @@ __FROZEN__ = hasattr(sys, "frozen") or hasattr(sys, "importers") or imp.is_froze
 
 if not __FROZEN__:
 	FOLDER = os.path.dirname(__file__)
-	# if sys.platform.startswith("win"):
-	# 	for version in ["2.7", "3.5", "3.6"]:
-	# 		os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
+	if sys.platform.startswith("win"):
+		for version in ["2.7", "3.5", "3.6"]:
+			os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
 else:
 	FOLDER = os.path.dirname(sys.executable)
-# sys.path.insert(0, os.path.join(FOLDER, "../../ark-new"))
 
 try:
 	version_info = sys.version_info[:2]
