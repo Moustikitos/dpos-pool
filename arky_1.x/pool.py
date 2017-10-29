@@ -15,10 +15,7 @@ else:
 	FOLDER = os.path.dirname(sys.executable)
 
 try:
-	version_info = sys.version_info[:2]
-	if version_info == (2, 7): import pshare27 as pshare
-	elif version_info == (3, 5): import pshare35 as pshare
-	elif version_info == (3, 6): import pshare36 as pshare
+	pshare = __import__("pshare%s%s" % sys.version_info[:2], globals(), locals(), [], 0)
 	SHARE = True
 except ImportError:
 	SHARE = False
@@ -99,7 +96,7 @@ def share(param):
 		elif param["<amount>"][0] in ["$", "€", "£", "¥"]:
 			price = util.getTokenPrice(cfg.token, {"$":"usd", "EUR":"eur", "€":"eur", "£":"gbp", "¥":"cny"}[amount[0]])
 			result = float(param["<amount>"][1:])/price
-			if util.askYesOrNo("%s=%f %s (%s/%s=%f) - Validate ?" % (amount, result, cfg.token, cfg.token, amount[0], price)):
+			if cli.askYesOrNo("%s=%f %s (%s/%s=%f) - Validate ?" % (amount, result, cfg.token, cfg.token, amount[0], price)):
 				amount = int(min(rewards, result*100000000))
 			else:
 				sys.stdout.write("    Share command canceled\n")
@@ -121,7 +118,16 @@ def share(param):
 			sys.stdout.write("Writing share for %.8f %s\n" % (amount/100000000, cfg.token))
 			# get voter contributions
 			voters = rest.GET.api.delegates.voters(publicKey=cli.DATA.delegate["publicKey"]).get("accounts", []) 
-			contributions = dict([v["address"], int(v["balance"])] for v in voters if v["address"] not in blacklist)
+			if param["--delay"]:
+				delay = int(param["--delay"])
+				sys.stdout.write("Checking %s day%s true vote weight...\n" % (delay, "s" if delay > 1 else ""))
+				contributions = {}
+				for voter in [v for v in voters if v["address"] not in blacklist]:
+					voteforce = util.getVoteForce(voter["address"], days=delay)
+					contributions[voter["address"]] = voteforce
+					sys.stdout.write("    %s : %.2f\n" % (voter["address"], voteforce))
+			else:
+				contributions = dict([v["address"], int(v["balance"])] for v in voters if v["address"] not in blacklist)
 			k = 1.0 / max(1, sum(contributions.values()))
 			contributions = dict((a, b*k) for a,b in contributions.items())
 
@@ -130,7 +136,7 @@ def share(param):
 			saved_payroll = util.loadJson(waiting_json, FOLDER)
 			tosave_payroll = {}
 			complement = {}
-			payroll = collections.OrderedDict()
+			payroll = {}
 
 			for address, ratio in contributions.items():
 				share = amount*ratio + saved_payroll.pop(address, 0)
@@ -148,12 +154,14 @@ def share(param):
 				else:
 					payroll[address] = share
 			
+			payroll = collections.OrderedDict(sorted(payroll.items(), key=lambda e:e[-1]))
+			tosave_payroll = collections.OrderedDict(sorted(tosave_payroll.items(), key=lambda e:e[-1]))
 			sys.stdout.write("Payroll in SATOSHI [%s file]:\n" % payroll_json)
 			util.prettyPrint(payroll)
 			sys.stdout.write("Saved payroll in SATOSHI [%s file]):\n" % waiting_json)
 			util.prettyPrint(tosave_payroll)
 
-			if util.askYesOrNo("Validate share payroll ?"):
+			if cli.askYesOrNo("Validate share payroll ?"):
 				tosave_payroll.update(saved_payroll)
 				util.dumpJson(tosave_payroll, waiting_json, FOLDER)
 				util.dumpJson(payroll, payroll_json, FOLDER)
@@ -170,11 +178,13 @@ def share(param):
 
 if __name__ == "__main__":
 	cli.delegate.__doc__ = """
-Usage: delegate link [<secret> <2ndSecret>]
-       delegate unlink
-       delegate status
-       delegate voters
-       delegate share <amount> [-b <blacklist> -d <delay> -l <lowest> -h <highest> <message>]
+Usage:
+    delegate link <secret> [<2ndSecret>]
+    delegate unlink
+    delegate status
+    delegate voters
+    delegate forged
+    delegate share <amount> [-b <blacklist> -d <delay> -l <lowest> -h <highest> <message>]
 
 Options:
 -b <blacklist> --blacklist <blacklist> addresses to exclude (comma-separated list or pathfile)
@@ -190,8 +200,9 @@ Subcommands:
     unlink : unlink delegate.
     status : show information about linked delegate.
     voters : show voters contributions ([address - vote] pairs).
+    forged : show forge report.
     share  : write share payroll for voters (if any) according to their
-             weight (there are mandatory fees)
+             weight (there are mandatory fees).
 """
 	cli.delegate.share = share
 	cli.start()
