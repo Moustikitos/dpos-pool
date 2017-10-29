@@ -1,7 +1,7 @@
 # -*- encoding: utf8 -*-
 # © Toons
 
-import os, imp, sys, collections
+import os, io, imp, sys, collections
 __PY3__ = True if sys.version_info[0] >= 3 else False
 __FROZEN__ = hasattr(sys, "frozen") or hasattr(sys, "importers") or imp.is_frozen("__main__")
 

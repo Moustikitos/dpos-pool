@@ -1,6 +1,5 @@
 Copyright 2017 **Toons**, `MIT licence`_
 
-
 Command line interface
 ======================
 
@@ -11,7 +10,7 @@ line interface.
 
 ::
 
-  Welcome to arky-cli [Python 3.6.0 / arky 1.0a0]
+  Welcome to arky-cli [Python x.y.z / arky x.y.z]
   Available commands: network, account, delegate
   cold@.../> network use
   Network(s) found:
@@ -28,7 +27,7 @@ line interface.
 
 ::
 
-  Welcome to arky-cli [Python 3.6.0 / arky 1.0a0]
+  Welcome to arky-cli [Python x.y.z / arky x.y.z]
   Available commands: network, account, delegate
   cold@.../> network use
   Network(s) found:
