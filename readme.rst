@@ -38,7 +38,7 @@ line interface.
       4 - toxy
   Choose an item: [1-4]> 4
   hot@toxy/network> delegate link "your secret with spaces between quotes"
-  hot@toxy/account[15600...1854X]> share <amoun> --options=values
+  hot@toxy/account[15600...1854X]> share <amount> --options=values
 
 + ``<amount>`` value can be:
    * relative value ie 10% of account balance
