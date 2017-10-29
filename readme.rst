@@ -4,8 +4,8 @@ Copyright 2017 **Toons**, `MIT licence`_
 Command line interface
 ======================
 
-You can use ``pyoxy`` package without writing a line of code trough command
-line interface. There are two ways to launch the CLI.
+You can use ``dpos-pool`` without writing a line of code trough command
+line interface.
 
 **How to send Oxycoins ?**
 
@@ -46,7 +46,6 @@ line interface. There are two ways to launch the CLI.
    * fiat ($60, £41, €62 or ¥125) value converted using ``coinmarketcap`` API
 + ``options`` can be :
    * ``-b`` or ``--blacklist`` a coma-separated-address-list or a full path to newline-separated-address file
-   * ``-d`` or ``--delay`` the number of day you want to analyse voters behaviour
    * ``-l`` or ``--lowest`` the treshold payout to trigger payment (unpaid payout are saved)
    * ``-h`` or ``--highest`` the ceiling payout
 
