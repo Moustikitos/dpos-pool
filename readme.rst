@@ -44,6 +44,7 @@ line interface.
    * absolute value using decimal numbers 45.6
    * fiat ($60, £41, €62 or ¥125) value converted using ``coinmarketcap`` API
 + ``options`` can be :
+   * ``-d`` or ``--delay`` a delay in days to check true voter weight
    * ``-b`` or ``--blacklist`` a coma-separated-address-list or a full path to newline-separated-address file
    * ``-l`` or ``--lowest`` the treshold payout to trigger payment (unpaid payout are saved)
    * ``-h`` or ``--highest`` the ceiling payout
