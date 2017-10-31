@@ -177,6 +177,10 @@ def share(param):
 
 
 if __name__ == "__main__":
+
+	cli.__doc__ = """Welcome to dpos-pool [Python %(python)s]
+Available commands: %(sets)s""" % {"python": sys.version.split()[0], "sets": ", ".join(cli.__all__)}
+
 	cli.delegate.__doc__ = """
 Usage:
     delegate link <secret> [<2ndSecret>]

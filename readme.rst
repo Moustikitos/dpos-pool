@@ -10,7 +10,7 @@ line interface.
 
 ::
 
-  Welcome to arky-cli [Python x.y.z / arky x.y.z]
+  Welcome to dpos-pool [Python x.y.z]
   Available commands: network, account, delegate
   cold@.../> network use
   Network(s) found:
@@ -27,7 +27,7 @@ line interface.
 
 ::
 
-  Welcome to arky-cli [Python x.y.z / arky x.y.z]
+  Welcome to dpos-pool [Python x.y.z]
   Available commands: network, account, delegate
   cold@.../> network use
   Network(s) found:
