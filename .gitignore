@@ -141,5 +141,6 @@ $RECYCLE.BIN/
 # Custom ignores
 app/
 private/
+source-based/
 *.forged
 *.waiting

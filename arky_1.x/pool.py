@@ -8,9 +8,10 @@ __FROZEN__ = hasattr(sys, "frozen") or hasattr(sys, "importers") or imp.is_froze
 
 if not __FROZEN__:
 	FOLDER = os.path.dirname(__file__)
-	if sys.platform.startswith("win"):
-		for version in ["2.7", "3.5", "3.6"]:
-			os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
+	sys.executable = __file__
+	# if sys.platform.startswith("win"):
+	# 	for version in ["2.7", "3.5", "3.6"]:
+	# 		os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
 else:
 	FOLDER = os.path.dirname(sys.executable)
 
@@ -86,7 +87,7 @@ def share(param):
 			rewards -= int(last["rewards"])
 		else:
 			blockreward = int(rest.GET.api.blocks.getReward(returnKey="reward"))
-			rewards = int(cli.DATA.account["balance"]) * rewards/float(forged_details["forged"])
+			rewards = int(cli.DATA.account["balance"]) * rewards/max(1, float(forged_details["forged"]))
 			rewards = (rewards//blockreward)*blockreward
 		forged_details.pop("success", False)
 
@@ -209,4 +210,8 @@ Subcommands:
              weight (there are mandatory fees).
 """
 	cli.delegate.share = share
-	cli.start()
+
+	if len(sys.argv) > 1 and os.path.exists(sys.argv[-1]):
+		cli.launch(sys.argv[-1])
+	else:
+		cli.start()
