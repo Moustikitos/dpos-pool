@@ -50,6 +50,26 @@ line interface.
    * ``-h`` or ``--highest`` the ceiling payout
 
 
+Windows users
+=============
+
+Download `latest relase`_ from github, extract archive and run ``pool.exe``
+
+Other OS users
+==============
+
+You can run the dpos-pool from source.
+
++ Install Python 3.5 or 3.6
++ install Arky AIP11 from github : 
+   * Ubuntu : ``sudo -H pip3 install https://github.com/Moustikitos/arky/archive/aip11.zip``
+   * Other OS : ``pip install https://github.com/Moustikitos/arky/archive/aip11.zip``
++ download `dpos-tool`_ from github
++ exctract archive and go to : ``dpos-tool/arky_1.x``
++ run pool :
+   * Ubuntu : ``python3 pool.py``
+   * Other OS : ``python -m pool`` or ``python pool.py``
+
 Authors
 =======
 
@@ -59,6 +79,9 @@ Support this project
 ====================
 
 + Toons Bitcoin address: ``1qjHtN5SuzvcA8RZSxNPuf79iyLaVjxfc``
++ Toons Ark address: ``AUahWfkfr5J4tYakugRbfow7RWVTK35GPW``
 + Toons Oxycoin address: ``12427608128403844156X``
 
 .. _MIT licence: http://htmlpreview.github.com/?https://github.com/Moustikitos/oxycoin/blob/master/pyoxy.html
+.. _latest relase: https://github.com/Moustikitos/dpos-pool/releases
+.. _dpos-tool: https://github.com/Moustikitos/dpos-pool/archive/master.zip
