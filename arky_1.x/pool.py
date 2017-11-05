@@ -8,7 +8,7 @@ __FROZEN__ = hasattr(sys, "frozen") or hasattr(sys, "importers") or imp.is_froze
 
 if not __FROZEN__:
 	FOLDER = os.path.dirname(__file__)
-	sys.executable = __file__
+	# sys.executable = __file__
 	# if sys.platform.startswith("win"):
 	# 	for version in ["2.7", "3.5", "3.6"]:
 	# 		os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
@@ -28,17 +28,15 @@ from arky import cli
 from arky import rest
 from arky import util
 
-
 def _payroll(param):
 
 	if cli.DATA.delegate:
 		payroll_json = "%s-%s.payroll" % (cli.DATA.delegate["username"], cfg.network)
 		payroll = util.loadJson(payroll_json, FOLDER)
+		ongoing_json = "%s-%s.ongoing" % (cli.DATA.delegate["username"], cfg.network)
+		ongoing = util.loadJson(ongoing_json, FOLDER)
 
-		ongoing = {}
 		if payroll:
-			ongoing_json = "%s-%s.ongoing" % (cli.DATA.delegate["username"], cfg.network)
-
 			for recipientId, amount in list(payroll.items()):
 				tx = arky.core.crypto.bakeTransaction(
 					amount=amount,
@@ -49,20 +47,15 @@ def _payroll(param):
 					secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None)
 				)
 				ongoing[tx["id"]] = tx
+				payroll.pop(recipientId, None)
 				sys.stdout.write("Sending %.8f %s to %s...\n" % (tx["amount"]/100000000, cfg.token, tx["recipientId"]))
-				if util.prettyPrint(arky.core.sendPayload(tx)):
-					payroll.pop(recipientId, None)
-					
+				util.prettyPrint(arky.core.sendPayload(tx))
+
 			util.dumpJson(ongoing, ongoing_json, FOLDER)
-			util.dumpJson(payroll, payroll_json, FOLDER)
+			util.popJson(payroll_json, FOLDER)
 
-			if cli.checkRegisteredTx(ongoing_json).wait():
-				util.popJson(payroll_json, FOLDER)
-				util.popJson(ongoing_json, FOLDER)
-
-
-def _getVoteForce():
-	pass
+		if cli.checkRegisteredTx(ongoing_json, FOLDER).wait():
+			util.popJson(ongoing_json, FOLDER)
 
 
 def share(param):
@@ -177,6 +170,10 @@ def share(param):
 		sys.stdout.write("    Share feature not available\n")
 
 
+def resume(param):
+	_payroll(param)
+
+
 if __name__ == "__main__":
 
 	cli.__doc__ = """Welcome to dpos-pool [Python %(python)s]
@@ -190,6 +187,7 @@ Usage:
     delegate voters
     delegate forged
     delegate share <amount> [-b <blacklist> -d <delay> -l <lowest> -h <highest> <message>]
+    delegate resume [<message>]
 
 Options:
 -b <blacklist> --blacklist <blacklist> addresses to exclude (comma-separated list or pathfile)
@@ -208,8 +206,11 @@ Subcommands:
     forged : show forge report.
     share  : write share payroll for voters (if any) according to their
              weight (there are mandatory fees).
+    resume : resume delegate payroll.
 """
+
 	cli.delegate.share = share
+	cli.delegate.resume = resume
 
 	if len(sys.argv) > 1 and os.path.exists(sys.argv[-1]):
 		cli.launch(sys.argv[-1])
