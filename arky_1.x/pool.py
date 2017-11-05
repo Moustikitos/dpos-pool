@@ -155,7 +155,8 @@ def share(param):
 			sys.stdout.write("Saved payroll in SATOSHI [%s file]):\n" % waiting_json)
 			util.prettyPrint(tosave_payroll)
 
-			if cli.askYesOrNo("Validate share payroll ?"):
+			if cli.askYesOrNo("Validate share payroll ?") \
+			   and cli.checkSecondKeys():
 				tosave_payroll.update(saved_payroll)
 				util.dumpJson(tosave_payroll, waiting_json, FOLDER)
 				util.dumpJson(payroll, payroll_json, FOLDER)
