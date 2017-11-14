@@ -8,10 +8,6 @@ __FROZEN__ = hasattr(sys, "frozen") or hasattr(sys, "importers") or imp.is_froze
 
 if not __FROZEN__:
 	FOLDER = os.path.dirname(__file__)
-	# sys.executable = __file__
-	# if sys.platform.startswith("win"):
-	# 	for version in ["2.7", "3.5", "3.6"]:
-	# 		os.system('''py -%s -c "import py_compile;py_compile.compile('private/pshare.py', cfile='pshare%s.pyc')"''' % (version, version.replace(".", "")))
 else:
 	FOLDER = os.path.dirname(sys.executable)
 
@@ -27,6 +23,7 @@ from arky import cfg
 from arky import cli
 from arky import rest
 from arky import util
+
 
 def _payroll(param):
 
@@ -56,6 +53,70 @@ def _payroll(param):
 
 		if cli.checkRegisteredTx(ongoing_json, FOLDER).wait():
 			util.popJson(ongoing_json, FOLDER)
+
+
+def checkPayloadApplied(payload):
+	LOCK = None
+	sys.stdout.write("    Waiting for payload being applied...\n")
+	@util.setInterval(2*cfg.blocktime)
+	def _checkPayload(payload):
+		if rest.GET.api.transactions.get(id=payload["id"]).get("success", False):
+			LOCK.set()
+		else:
+			arky.core.sendPayload(payload)
+	LOCK = _checkPayload(payload)
+	return LOCK
+
+
+_vote = cli.account.vote
+def vote(param):
+
+	if cli.DATA.account and param["--manage"]:
+		if os.path.exists(param["<delegates>"]) and param["<delegates>"] != "":
+			with io.open(param["<delegates>"], "r") as in_:
+				candidates = [e for e in in_.read().split() if e != ""]
+		else:
+			candidates = [c for c in param["<delegates>"].split(",") if c != ""]
+
+		voted = rest.GET.api.accounts.delegates(address=cli.DATA.account["address"]).get("delegates", [])
+		voted = [d["username"] for d in voted]
+
+		unvote = [d for d in voted if d not in candidates]
+		vote = [d for d in candidates if d not in voted]
+
+		all_delegates = util.getCandidates()
+		if len(unvote) and cli.checkSecondKeys():
+			for i in range(0, len(unvote), cfg.maxvotepertx):
+				lst = [d["publicKey"] for d in all_delegates if d["username"] in unvote[i:i+cfg.maxvotepertx]]
+				payload = arky.core.crypto.bakeTransaction(
+					type=3,
+					recipientId=cli.DATA.account["address"],
+					publicKey=cli.DATA.firstkeys["publicKey"],
+					privateKey=cli.DATA.firstkeys["privateKey"],
+					secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
+					asset={"votes": ["-%s"%pk for pk in lst]}
+				)
+				sys.stdout.write("    Broadcasting down-votes...\n")
+				util.prettyPrint(arky.core.sendPayload(payload))
+				checkPayloadApplied(payload).wait()
+
+		if len(vote) and cli.checkSecondKeys():
+			for i in range(0, len(vote), cfg.maxvotepertx):
+				lst = [d["publicKey"] for d in all_delegates if d["username"] in vote[i:i+cfg.maxvotepertx]]
+				payload = arky.core.crypto.bakeTransaction(
+					type=3,
+					recipientId=cli.DATA.account["address"],
+					publicKey=cli.DATA.firstkeys["publicKey"],
+					privateKey=cli.DATA.firstkeys["privateKey"],
+					secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
+					asset={"votes": ["+%s"%pk for pk in lst]}
+				)
+				sys.stdout.write("    Broadcasting up-votes...\n")
+				util.prettyPrint(arky.core.sendPayload(payload))
+				checkPayloadApplied(payload).wait()
+
+	else:
+		_vote(param)
 
 
 def share(param):
@@ -210,6 +271,42 @@ Subcommands:
     resume : resume delegate payroll.
 """
 
+	cli.account.__doc__ = """
+Usage:
+    account link <secret> [<2ndSecret>|-e]
+    account unlink
+    account status
+    account register <username>
+    account register 2ndSecret <secret>
+    account register escrow <thirdparty>
+    account validate <registry>
+    account vote [-udm] [<delegates>]
+    account send <amount> <address> [<message>]
+
+Options:
+-e --escrow  link as escrowed account
+-u --up      up vote delegate name folowing
+-d --down    down vote delegate name folowing
+-m --manage  send vote transactions to match asked delegates
+
+Subcommands:
+    link     : link to account using secret passphrases. If secret passphrases
+               contains spaces, it must be enclosed within double quotes
+               (ie "secret with spaces").
+    unlink   : unlink account.
+    status   : show information about linked account.
+    register : register linked account as delegate;
+               or
+               register second signature to linked account;
+			   or
+               register an escrower using an account address or a publicKey.
+    validate : validate transaction from registry.
+    vote     : up or down vote delegate(s). <delegates> can be a coma-separated list
+               or a valid new-line-separated file list conaining delegate usernames.
+    send     : send ARK amount to address. You can set a 64-char message.
+"""
+
+	cli.account.vote = vote
 	cli.delegate.share = share
 	cli.delegate.resume = resume
 

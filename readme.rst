@@ -6,7 +6,7 @@ Command line interface
 You can use ``dpos-pool`` without writing a line of code trough command
 line interface.
 
-**How to send Oxycoins ?**
+**How to send Token ?**
 
 ::
 
@@ -37,7 +37,7 @@ line interface.
       4 - toxy
   Choose an item: [1-4]> 4
   hot@toxy/network> delegate link "your secret with spaces between quotes"
-  hot@toxy/account[15600...1854X]> share <amount> --options=values
+  hot@toxy/delegate[username]> share <amount> --options=values
 
 + ``<amount>`` value can be:
    * relative value ie 10% of account balance
@@ -49,6 +49,21 @@ line interface.
    * ``-l`` or ``--lowest`` the treshold payout to trigger payment (unpaid payout are saved)
    * ``-h`` or ``--highest`` the ceiling payout
 
+**Easy way to manage multiple votes ?**
+
+For blockchains allowing multiple vote per account, it can be hard to update
+votes. DPOS pool propose you to manage vote from a delegate list. Just give
+the final vote you want and it will send down-vote and up-vote transactions to
+match exactly what you asked.
+
+::
+
+  hot@toxy/delegate[username]> account
+  hot@toxy/account[15600...1854X]> vote -m <delegates>
+
++ ``<delegates>`` value can be:
+   * a coma-separated username list
+   * a ath to a file containing new-line-separated username list
 
 Windows users
 =============
