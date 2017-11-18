@@ -47,8 +47,9 @@ def _payroll(param):
 				payroll.pop(recipientId, None)
 				sys.stdout.write("Sending %.8f %s to %s...\n" % (tx["amount"]/100000000, cfg.token, tx["recipientId"]))
 				util.prettyPrint(arky.core.sendPayload(tx))
+				util.dumpJson(payroll, payroll_json, FOLDER)
+				util.dumpJson(ongoing, ongoing_json, FOLDER)
 
-			util.dumpJson(ongoing, ongoing_json, FOLDER)
 			util.popJson(payroll_json, FOLDER)
 
 		if cli.checkRegisteredTx(ongoing_json, FOLDER).wait():
@@ -57,8 +58,8 @@ def _payroll(param):
 
 def checkPayloadApplied(payload):
 	LOCK = None
-	sys.stdout.write("    Waiting for payload being applied...\n")
-	@util.setInterval(2*cfg.blocktime)
+	sys.stdout.write("Waiting for payload being applied...\n")
+	@util.setInterval(cfg.blocktime)
 	def _checkPayload(payload):
 		if rest.GET.api.transactions.get(id=payload["id"]).get("success", False):
 			LOCK.set()
@@ -88,32 +89,34 @@ def vote(param):
 		if len(unvote) and cli.checkSecondKeys():
 			for i in range(0, len(unvote), cfg.maxvotepertx):
 				lst = [d["publicKey"] for d in all_delegates if d["username"] in unvote[i:i+cfg.maxvotepertx]]
-				payload = arky.core.crypto.bakeTransaction(
-					type=3,
-					recipientId=cli.DATA.account["address"],
-					publicKey=cli.DATA.firstkeys["publicKey"],
-					privateKey=cli.DATA.firstkeys["privateKey"],
-					secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
-					asset={"votes": ["-%s"%pk for pk in lst]}
-				)
-				sys.stdout.write("    Broadcasting down-votes...\n")
-				util.prettyPrint(arky.core.sendPayload(payload))
-				checkPayloadApplied(payload).wait()
+				if len(lst):
+					payload = arky.core.crypto.bakeTransaction(
+						type=3,
+						recipientId=cli.DATA.account["address"],
+						publicKey=cli.DATA.firstkeys["publicKey"],
+						privateKey=cli.DATA.firstkeys["privateKey"],
+						secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
+						asset={"votes": ["-%s"%pk for pk in lst]}
+					)
+					sys.stdout.write("Broadcasting down-vote for %s\n" % (",".join(unvote[i:i+cfg.maxvotepertx])))
+					util.prettyPrint(arky.core.sendPayload(payload))
+					checkPayloadApplied(payload).wait()
 
 		if len(vote) and cli.checkSecondKeys():
 			for i in range(0, len(vote), cfg.maxvotepertx):
 				lst = [d["publicKey"] for d in all_delegates if d["username"] in vote[i:i+cfg.maxvotepertx]]
-				payload = arky.core.crypto.bakeTransaction(
-					type=3,
-					recipientId=cli.DATA.account["address"],
-					publicKey=cli.DATA.firstkeys["publicKey"],
-					privateKey=cli.DATA.firstkeys["privateKey"],
-					secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
-					asset={"votes": ["+%s"%pk for pk in lst]}
-				)
-				sys.stdout.write("    Broadcasting up-votes...\n")
-				util.prettyPrint(arky.core.sendPayload(payload))
-				checkPayloadApplied(payload).wait()
+				if len(lst):
+					payload = arky.core.crypto.bakeTransaction(
+						type=3,
+						recipientId=cli.DATA.account["address"],
+						publicKey=cli.DATA.firstkeys["publicKey"],
+						privateKey=cli.DATA.firstkeys["privateKey"],
+						secondPrivateKey=cli.DATA.secondkeys.get("privateKey", None),
+						asset={"votes": ["+%s"%pk for pk in lst]}
+					)
+					sys.stdout.write("Broadcasting up-vote for %s\n" % (",".join(vote[i:i+cfg.maxvotepertx])))
+					util.prettyPrint(arky.core.sendPayload(payload))
+					checkPayloadApplied(payload).wait()
 
 	else:
 		_vote(param)
