@@ -63,7 +63,7 @@ match exactly what you asked.
 
 + ``<delegates>`` value can be:
    * a coma-separated username list
-   * a ath to a file containing new-line-separated username list
+   * a path to a file containing new-line-separated username list
 
 Windows users
 =============
