@@ -97,6 +97,6 @@ Support this project
 + Toons Ark address: ``AUahWfkfr5J4tYakugRbfow7RWVTK35GPW``
 + Toons Oxycoin address: ``12427608128403844156X``
 
-.. _MIT licence: http://htmlpreview.github.com/?https://github.com/Moustikitos/oxycoin/blob/master/pyoxy.html
+.. _MIT licence: http://htmlpreview.github.com/?https://github.com/Moustikitos/dpos-pool/blob/master/dpos-pool.html
 .. _latest relase: https://github.com/Moustikitos/dpos-pool/releases
 .. _dpos-tool: https://github.com/Moustikitos/dpos-pool/archive/master.zip
