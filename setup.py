@@ -21,7 +21,10 @@ kw.update(**{
 	"url": "https://github.com/Moustikitos/dpos-pool",
 	"download_url": "https://github.com/Moustikitos/dpos-pool.git",
 	"include_package_data": True,
-	"data_files": [("", ["lib/pshare%d%d.pyc"%sys.version_info[:2]])],
+	"data_files": [
+		("", ["lib/pshare%d%d.pyc"%sys.version_info[:2]]),
+		("", ["dpos-pool.html"])
+	],
 	"description": "One CLI to rule all DPOS blockchains",
 	"long_description": long_description.read(),
 	"packages": [],
