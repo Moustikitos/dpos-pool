@@ -15,7 +15,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -144,4 +143,5 @@ private/
 source-based/
 *.forged
 *.waiting
+*.vote
 arky_0.x.zip
