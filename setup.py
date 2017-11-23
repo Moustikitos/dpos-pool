@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 # created by Toons on 01/05/2017
+import sys
 try:
 	from setuptools import setup
 	import wheel
@@ -11,7 +12,7 @@ f = open("VERSION", "r")
 long_description = open("readme.rst", "r")
 kw.update(**{
 	"version": f.read().strip(),
-	"name": "DPOS-pool",
+	"name": "dpos-pool",
 	"keywords": ["cli", "dpos", "blockchain"],
 	"author": "Toons",
 	"author_email": "moustikitos@gmail.com",
@@ -20,9 +21,11 @@ kw.update(**{
 	"url": "https://github.com/Moustikitos/dpos-pool",
 	"download_url": "https://github.com/Moustikitos/dpos-pool.git",
 	"include_package_data": True,
+	"data_files": [("", ["lib/pshare%d%d.pyc"%sys.version_info[:2]])],
 	"description": "One CLI to rule all DPOS blockchains",
 	"long_description": long_description.read(),
 	"packages": [],
+	"scripts": ["lib/pool.py"],
 	"install_requires": ["arky", "requests"],
 	"license": "Copyright 2017 Toons, MIT licence",
 	"classifiers": [
