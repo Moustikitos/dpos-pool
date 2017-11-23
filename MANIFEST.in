@@ -1,1 +1,1 @@
-recursive-include lib pshare??.pyc
+include lib/pshare??.pyc
