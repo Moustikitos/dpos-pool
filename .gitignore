@@ -143,5 +143,7 @@ private/
 source-based/
 *.forged
 *.waiting
+*.blacklist
 *.vote
 arky_0.x.zip
+lib/arky-ark.blacklist

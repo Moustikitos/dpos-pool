@@ -29,7 +29,7 @@ kw.update(**{
 	"long_description": long_description.read(),
 	"packages": [],
 	"scripts": ["lib/pool.py"],
-	"install_requires": ["arky", "requests"],
+	"install_requires": ["arky>=1.0"],
 	"license": "Copyright 2017 Toons, MIT licence",
 	"classifiers": [
 		'Development Status :: 6 - Mature',
