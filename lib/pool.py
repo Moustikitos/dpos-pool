@@ -248,6 +248,7 @@ Available commands: %(sets)s""" % {"python": sys.version.split()[0], "sets": ", 
 Usage:
     delegate link <secret> [<2ndSecret>]
     delegate unlink
+    delegate save <name>
     delegate status
     delegate voters
     delegate forged
@@ -266,6 +267,7 @@ Subcommands:
              ("secret with spaces"). If no secret given, it tries to link
              with saved account(s).
     unlink : unlink delegate.
+    save   : encrypt account using pin code and save it localy.
     status : show information about linked delegate.
     voters : show voters contributions ([address - vote] pairs).
     forged : show forge report.
@@ -276,27 +278,28 @@ Subcommands:
 
 	cli.account.__doc__ = """
 Usage:
-    account link <secret> [<2ndSecret>|-e]
+    account link [<secret>] [<2ndSecret>|-e]
     account unlink
     account status
+    account save <name>
     account register <username>
     account register 2ndSecret <secret>
     account register escrow <thirdparty>
     account validate <registry>
-    account vote [-udm] [<delegates>]
+    account vote [-ud] [<delegates>]
     account send <amount> <address> [<message>]
 
 Options:
 -e --escrow  link as escrowed account
 -u --up      up vote delegate name folowing
 -d --down    down vote delegate name folowing
--m --manage  send vote transactions to match asked delegates
 
 Subcommands:
     link     : link to account using secret passphrases. If secret passphrases
                contains spaces, it must be enclosed within double quotes
                (ie "secret with spaces").
     unlink   : unlink account.
+    save     : encrypt account using pin code and save it localy.
     status   : show information about linked account.
     register : register linked account as delegate;
                or
@@ -305,8 +308,8 @@ Subcommands:
                register an escrower using an account address or a publicKey.
     validate : validate transaction from registry.
     vote     : up or down vote delegate(s). <delegates> can be a coma-separated list
-               or a valid new-line-separated file list conaining delegate usernames.
-    send     : send ARK amount to address. You can set a 64-char message.
+               or a valid new-line-separated file list conaining delegate names.
+    send     : send token amount to address. You can set a 64-char message.
 """
 
 	cli.account.vote = vote
