@@ -160,7 +160,8 @@ def share(param):
 				sys.stdout.write("    Share command canceled\n")
 				return
 		else:
-			amount = int(min(rewards, float(param["<amount>"])*100000000))
+			# amount = int(min(rewards, float(param["<amount>"])*100000000))
+			amount = int(float(param["<amount>"])*100000000)
 
 		# define treshold and ceiling
 		if param["--lowest"]:
@@ -181,7 +182,8 @@ def share(param):
 				sys.stdout.write("Checking %s day%s true vote weight...\n" % (delay, "s" if delay > 1 else ""))
 				contributions = {}
 				for voter in [v for v in voters if v["address"] not in blacklist]:
-					voteforce = util.getVoteForce(voter["address"], days=delay)
+					# print(">>>", voter)
+					voteforce = util.getVoteForce(voter["address"], balance=int(voter["balance"]), days=delay)
 					contributions[voter["address"]] = voteforce
 					sys.stdout.write("    %s : %.2f\n" % (voter["address"], voteforce))
 			else:
@@ -286,13 +288,14 @@ Usage:
     account register 2ndSecret <secret>
     account register escrow <thirdparty>
     account validate <registry>
-    account vote [-ud] [<delegates>]
+    account vote [-udm] [<delegates>]
     account send <amount> <address> [<message>]
 
 Options:
 -e --escrow  link as escrowed account
 -u --up      up vote delegate name folowing
 -d --down    down vote delegate name folowing
+-m --manage  manage vote
 
 Subcommands:
     link     : link to account using secret passphrases. If secret passphrases
