@@ -145,5 +145,6 @@ source-based/
 *.waiting
 *.blacklist
 *.vote
+*.status
 arky_0.x.zip
 lib/arky-ark.blacklist
