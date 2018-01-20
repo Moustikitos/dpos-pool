@@ -80,7 +80,7 @@ You can run the dpos-pool from source.
    * Ubuntu : ``sudo -H pip3 install https://github.com/Moustikitos/arky/archive/aip11.zip``
    * Other OS : ``pip install https://github.com/Moustikitos/arky/archive/aip11.zip``
 + download `dpos-tool`_ from github
-+ exctract archive and go to : ``dpos-tool/arky_1.x``
++ exctract archive and go to : ``dpos-tool/lib``
 + run pool :
    * Ubuntu : ``python3 pool.py``
    * Other OS : ``python -m pool`` or ``python pool.py``
