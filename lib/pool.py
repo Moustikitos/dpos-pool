@@ -36,7 +36,7 @@ def _payroll(param):
 		if payroll:
 			for recipientId, amount in list(payroll.items()):
 				tx = arky.core.crypto.bakeTransaction(
-					amount=amount,
+					amount=amount - cfg.fees["send"],
 					recipientId=recipientId,
 					vendorField=param.get("<message>", None),
 					publicKey=cli.DATA.firstkeys["publicKey"],
@@ -160,16 +160,16 @@ def share(param):
 				sys.stdout.write("    Share command canceled\n")
 				return
 		else:
-			# amount = int(min(rewards, float(param["<amount>"])*100000000))
-			amount = int(float(param["<amount>"])*100000000)
+			amount = int(min(rewards, float(param["<amount>"])*100000000))
+		#	amount = int(float(param["<amount>"])*100000000)
 
 		# define treshold and ceiling
 		if param["--lowest"]:
-			minimum = int(float(param["--lowest"])*100000000 + cfg.fees["send"])
+			minimum = int(float(param["--lowest"])*100000000) # + cfg.fees["send"])
 		else:
 			minimum = int(cfg.fees["send"])
 		if param["--highest"]:
-			maximum = int(float(param["--highest"])*100000000 + cfg.fees["send"])
+			maximum = int(float(param["--highest"])*100000000) # + cfg.fees["send"])
 		else:
 			maximum = amount
 

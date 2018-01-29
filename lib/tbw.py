@@ -116,6 +116,10 @@ def computeRound():
 	global STATUS, FORGED
 
 	seed = getBestSeed()
+	if not seed:
+		print(">>> [%s] No seed available for now !" % reprNow())
+		return
+
 	resp = json.loads(urlOpenRead(seed+"/api/delegates/forging/getForgedByAccount?generatorPublicKey="+CONFIG["delegate_pubkey"]))
 	
 	reward = 0
