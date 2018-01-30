@@ -34,9 +34,9 @@ def _payroll(param):
 		ongoing = util.loadJson(ongoing_json, FOLDER)
 
 		if payroll:
-			for recipientId, amount in list(payroll.items()):
+			for recipientId, amount in sorted(list(payroll.items()), key=lambda i:i[-1], reverse=True):
 				tx = arky.core.crypto.bakeTransaction(
-					amount=amount - cfg.fees["send"],
+					amount=amount,
 					recipientId=recipientId,
 					vendorField=param.get("<message>", None),
 					publicKey=cli.DATA.firstkeys["publicKey"],
@@ -165,11 +165,11 @@ def share(param):
 
 		# define treshold and ceiling
 		if param["--lowest"]:
-			minimum = int(float(param["--lowest"])*100000000) # + cfg.fees["send"])
+			minimum = int(float(param["--lowest"])*100000000 + cfg.fees["send"])
 		else:
 			minimum = int(cfg.fees["send"])
 		if param["--highest"]:
-			maximum = int(float(param["--highest"])*100000000) # + cfg.fees["send"])
+			maximum = int(float(param["--highest"])*100000000 + cfg.fees["send"])
 		else:
 			maximum = amount
 
@@ -201,7 +201,7 @@ def share(param):
 			for address, ratio in contributions.items():
 				share = amount*ratio + saved_payroll.pop(address, 0)
 				if share >= maximum:
-					payroll[address] = int(maximum)
+					payroll[address] = int(maximum) - cfg.fees["send"]
 				elif share < minimum:
 					tosave_payroll[address] = int(share)
 				else:
@@ -212,7 +212,7 @@ def share(param):
 				if share < minimum:
 					tosave_payroll[address] = share
 				else:
-					payroll[address] = share
+					payroll[address] = share - cfg.fees["send"]
 			
 			payroll = collections.OrderedDict(sorted(payroll.items(), key=lambda e:e[-1]))
 			tosave_payroll = collections.OrderedDict(sorted(tosave_payroll.items(), key=lambda e:e[-1]))
@@ -227,7 +227,6 @@ def share(param):
 				util.dumpJson(tosave_payroll, waiting_json, FOLDER)
 				util.dumpJson(payroll, payroll_json, FOLDER)
 				util.dumpJson(forged_details, forged_json, FOLDER)
-
 				_payroll(param)
 			else:
 				sys.stdout.write("    Share canceled\n")
@@ -248,7 +247,7 @@ Available commands: %(sets)s""" % {"python": sys.version.split()[0], "sets": ", 
 
 	cli.delegate.__doc__ = """
 Usage:
-    delegate link <secret> [<2ndSecret>]
+    delegate link [<secret>] [<2ndSecret>]
     delegate unlink
     delegate save <name>
     delegate status
